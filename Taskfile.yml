@@ -1,0 +1,78 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  C_PROJECT: pico-c
+  C_DIR: '{{.C_PROJECT}}'
+  BUILD_DIR: '{{.C_DIR}}/build'
+
+env:
+  # Full path to pico-sdk
+  PICO_SDK_PATH: 
+    sh: readlink -f pico-sdk
+
+dotenv: [.env]
+
+tasks:
+  install-pico-sdk:
+    desc: pico-sdk is required to build this project
+    deps: [clone-pico-sdk]
+
+  clone-pico-sdk:
+    cmds:
+      - git clone https://github.com/raspberrypi/pico-sdk.git --branch master
+      - git -C pico-sdk submodule update --init
+
+  install-toolchain:
+    desc: Toolchain is required to build this project
+    cmds:
+      - sudo apt update
+      - sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential
+
+  build:
+    deps: [zig, c]
+    desc: Build the binary
+    dir: '{{.BUILD_DIR}}'
+    cmds:
+      - make {{.C_DIR}}
+    preconditions:
+      - sh: '[ -n "$PICO_SDK_PATH" ]'
+        msg: '$PIC_SDK_PATH not set'
+
+  zig:
+    desc: Buid the zig library
+    dir: main-zig
+    cmds:
+      - zig build
+
+  c:
+    deps: [build-dir]
+    desc: Build the c build
+    dir: '{{.BUILD_DIR}}'
+    cmds:
+      - cmake ..
+    
+  build-dir:
+    cmds:
+      - mkdir -p {{.BUILD_DIR}}
+
+  clean:
+    - rm -r {{.BUILD_DIR}}
+
+  install:
+    desc:
+      Install the build uf2 file to pico-w. 
+      Start in bootsel mode by holding the button on the pico,
+      when plugging in the usb cable.
+    env:
+      MOUNT_DIR: 
+        sh: echo /media/$USER/RPI-RP2
+    cmds:
+      - sudo mkdir -p $MOUNT_DIR
+      - sudo mount $DEVICE $MOUNT_DIR
+      - defer: sudo umount $MOUNT_DIR
+      - sudo cp {{.BUILD_DIR}}/{{.C_PROJECT}}.uf2 $MOUNT_DIR
+    preconditions:
+      - sh: '[ -n "$DEVICE" ]'
+        msg: "$DEVICE is not set. You can set it in the .env file."
