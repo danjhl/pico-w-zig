@@ -17,9 +17,6 @@ dotenv: [.env]
 tasks:
   install-pico-sdk:
     desc: pico-sdk is required to build this project
-    deps: [clone-pico-sdk]
-
-  clone-pico-sdk:
     cmds:
       - git clone https://github.com/raspberrypi/pico-sdk.git --branch master
       - git -C pico-sdk submodule update --init
