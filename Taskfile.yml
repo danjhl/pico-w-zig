@@ -38,7 +38,7 @@ tasks:
       - make {{.C_DIR}}
     preconditions:
       - sh: '[ -n "$PICO_SDK_PATH" ]'
-        msg: '$PIC_SDK_PATH not set'
+        msg: '$PICO_SDK_PATH not set'
 
   zig:
     desc: Buid the zig library

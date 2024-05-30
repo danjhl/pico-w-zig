@@ -1,4 +1,4 @@
-# Pico-w project using zig
+# Pico-w zig project template
 
 This project requires [task](https://taskfile.dev/) and
 [zig](https://ziglang.org/).
