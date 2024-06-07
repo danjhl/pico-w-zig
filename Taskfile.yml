@@ -73,3 +73,13 @@ tasks:
     preconditions:
       - sh: '[ -n "$DEVICE" ]'
         msg: "$DEVICE is not set. You can set it in the .env file."
+
+    connect:
+      desc:
+        Connect to pico serial device
+      cmds:
+        -  sudo minicom -o -D $TTY
+      preconditions:
+        - sh: '[ -n "$TTY" ]'
+          msg: '$TTY is not set. You can set it in the .env file.'
+

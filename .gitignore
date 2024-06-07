@@ -2,3 +2,4 @@ main-zig/zig-out
 main-zig/zig-cache
 pico-c/build
 pico-sdk
+.env
